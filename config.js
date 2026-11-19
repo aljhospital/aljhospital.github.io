@@ -40,6 +40,7 @@ window.SITE = {
   colors: {
     primary: "#E63038",
     text: "#000000",
+    qrGreen: "#007A3D",   // only used for the "Green" option in the QR code maker
   },
 
   // "auto" = Arabic for Arabic phones, English for everyone else.

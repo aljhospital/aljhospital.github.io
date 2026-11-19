@@ -63,6 +63,7 @@
       <div class="seg" id="colour">
         <button type="button" data-c="black" aria-pressed="true">Black (safest)</button>
         <button type="button" data-c="brand" aria-pressed="false">Hospital red</button>
+        <button type="button" data-c="green" aria-pressed="false">Green</button>
       </div>
       <label class="check" id="logoRow"><input type="checkbox" id="withLogo" checked> Hospital logo in the middle</label>
     </div>
@@ -125,7 +126,11 @@
       $("logoRow").hidden = true;
     }
 
-    function fg() { return state.colour === "black" ? "#000000" : (colours.primary || "#E63038"); }
+    function fg() {
+      if (state.colour === "black") return "#000000";
+      if (state.colour === "green") return colours.qrGreen || "#007A3D";
+      return colours.primary || "#E63038";
+    }
     function useLogo() { return !!state.logo && $("withLogo").checked; }
 
     function build(text) {
