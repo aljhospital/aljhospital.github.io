@@ -25,7 +25,12 @@
       width: 100%; font: inherit; font-size: 15px; padding: 11px 13px;
       border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 16px; direction: ltr;
     }
-    input[type=url]:focus { outline: none; border-color: var(--primary); }
+    input[type=url]:focus, .label-fields input[type=text]:focus { outline: none; border-color: var(--primary); }
+    .label-fields { margin: 10px 0 0; }
+    .label-fields input[type=text] {
+      width: 100%; font: inherit; font-size: 15px; padding: 10px 13px;
+      border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 10px;
+    }
     .check { display: flex; align-items: center; gap: 8px; font-size: 14.5px; margin-bottom: 4px; }
     .check input { width: 18px; height: 18px; accent-color: var(--primary); }
     .preview { display: grid; place-items: center; padding: 24px; }
@@ -67,6 +72,12 @@
         <button type="button" data-c="green" aria-pressed="false">Green</button>
       </div>
       <label class="check" id="logoRow"><input type="checkbox" id="withLogo" checked> Hospital logo in the middle</label>
+      <label class="check"><input type="checkbox" id="withLabel" checked> Label under the code</label>
+      <div id="labelFields" class="label-fields">
+        <input type="text" id="labelAr" dir="rtl" lang="ar" placeholder="النص بالعربي" autocomplete="off">
+        <input type="text" id="labelEn" dir="ltr" lang="en" placeholder="English text" autocomplete="off">
+        <label class="check"><input type="checkbox" id="withAddr" checked> Show the short address under the label</label>
+      </div>
     </div>
 
     <div class="card panel">
@@ -100,6 +111,66 @@
 
     var $ = function (id) { return document.getElementById(id); };
     var state = { target: "links", colour: "black", logo: null };
+
+    // Ready-made labels for each kind of code (they can be edited on the page).
+    var LABELS = {
+      links:    { ar: "امسح لروابطنا", en: "Scan for all our links" },
+      app:      { ar: "امسح لتحميل التطبيق", en: "Scan to download our app" },
+      whatsapp: { ar: "امسح للحجز عبر واتساب", en: "Scan to book on WhatsApp" },
+      custom:   { ar: "", en: "" },
+    };
+    var FONT = '"IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif';
+    var fontsReady = (document.fonts && document.fonts.load)
+      ? Promise.all(["400", "600", "700"].map(function (w) {
+          return document.fonts.load(w + " 40px " + FONT, "امسح Scan");
+        })).catch(function () {})
+      : Promise.resolve();
+
+    function shortAddress(url) {
+      return url.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/+$/, "");
+    }
+
+    function labelLines() {
+      if (!$("withLabel").checked) return [];
+      var lines = [], ar = $("labelAr").value.trim(), en = $("labelEn").value.trim();
+      if (ar) lines.push({ text: ar, dir: "rtl", weight: 700, size: 0.072, color: fg() });
+      if (en) lines.push({ text: en, dir: "ltr", weight: 600, size: 0.054, color: "#111111" });
+      if ($("withAddr").checked) {
+        var u = $("url").value.trim();
+        if (u) lines.push({ text: shortAddress(u), dir: "ltr", weight: 400, size: 0.046, color: "#555555" });
+      }
+      return lines;
+    }
+
+    // The label block as its own white image, W pixels wide (sizes scale with W).
+    function labelCanvas(W) {
+      var lines = labelLines();
+      if (!lines.length) return null;
+      var c = document.createElement("canvas"), g = c.getContext("2d");
+      var sizes = lines.map(function (l) {
+        var px = l.size * W;
+        g.font = l.weight + " " + px + "px " + FONT;
+        var w = g.measureText(l.text).width;
+        return w > W * 0.9 ? px * (W * 0.9) / w : px; // shrink long lines to fit
+      });
+      var H = 0;
+      sizes.forEach(function (px) { H += px * 1.5; });
+      H += W * 0.05; // white space at the bottom
+      c.width = W; c.height = Math.ceil(H);
+      g = c.getContext("2d");
+      g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+      g.textAlign = "center";
+      var y = 0;
+      lines.forEach(function (l, i) {
+        var px = sizes[i];
+        g.font = l.weight + " " + px + "px " + FONT;
+        g.direction = l.dir;
+        g.fillStyle = l.color;
+        g.fillText(l.text, W / 2, y + px * 1.1);
+        y += px * 1.5;
+      });
+      return c;
+    }
 
     // Base address of the links page.
     function baseUrl() {
@@ -164,7 +235,8 @@
       } catch (e) { return null; } // opened from disk: browser blocks reading the image
     }
 
-    function svgString(qr) {
+    // labelPx: how many pixels wide to draw the label image (bigger = sharper print).
+    function svgString(qr, labelPx) {
       var n = qr.getModuleCount(), q = 4, size = n + 2 * q, box = useLogo() ? logoBox(n) : null;
       var d = "";
       for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
@@ -172,9 +244,14 @@
         if (box && c >= box.bx && c < box.bx + box.bw && r >= box.by && r < box.by + box.bh) continue;
         d += "M" + (c + q) + " " + (r + q) + "h1v1h-1z";
       }
-      var out = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + " " + size + '" shape-rendering="crispEdges">' +
-        '<rect width="' + size + '" height="' + size + '" fill="#fff"/>' +
-        '<path fill="' + fg() + '" d="' + d + '"/>';
+      var lc = labelCanvas(labelPx || 1200), lh = lc ? lc.height / lc.width * size : 0;
+      var total = size + lh;
+      var out = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + " " + total + '">' +
+        '<rect width="' + size + '" height="' + total + '" fill="#fff"/>' +
+        '<path fill="' + fg() + '" shape-rendering="crispEdges" d="' + d + '"/>';
+      if (lc) {
+        out += '<image href="' + lc.toDataURL("image/png") + '" x="0" y="' + size + '" width="' + size + '" height="' + lh + '"/>';
+      }
       if (box) {
         var data = logoDataUrl();
         if (data) {
@@ -189,7 +266,9 @@
       var n = qr.getModuleCount(), q = 4, size = n + 2 * q;
       var scale = Math.max(8, Math.floor(2048 / size));
       var cv = document.createElement("canvas");
-      cv.width = cv.height = size * scale;
+      var lc = labelCanvas(size * scale);
+      cv.width = size * scale;
+      cv.height = size * scale + (lc ? lc.height : 0);
       var g = cv.getContext("2d");
       g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
       g.fillStyle = fg();
@@ -202,6 +281,7 @@
       if (box) {
         g.drawImage(state.logo, (box.lx + q) * scale, (box.ly + q) * scale, box.lw * scale, box.lh * scale);
       }
+      if (lc) g.drawImage(lc, 0, size * scale);
       try { cv.toBlob(cb, "image/png"); }
       catch (e) { alert("The browser blocked the logo when this page was opened from a file. Open it from the live website, or untick the logo."); }
     }
@@ -239,10 +319,14 @@
       $("png").disabled = $("svg").disabled = false;
     }
 
-    function setTarget(t) {
+    function setTarget(t, url) {
       state.target = t;
       [].forEach.call($("target").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.t === t)); });
-      if (t !== "custom") $("url").value = suggested(t);
+      var l = LABELS[t] || LABELS.custom;
+      $("labelAr").value = l.ar;
+      $("labelEn").value = l.en;
+      if (url) $("url").value = url;
+      else if (t !== "custom") $("url").value = suggested(t);
       else { $("url").value = ""; $("url").focus(); }
       draw();
     }
@@ -255,13 +339,18 @@
       draw();
     });
     $("withLogo").addEventListener("change", draw);
-    $("url").addEventListener("input", draw);
+    $("withLabel").addEventListener("change", function () { $("labelFields").hidden = !$("withLabel").checked; draw(); });
+    ["withAddr"].forEach(function (id) { $(id).addEventListener("change", draw); });
+    ["url", "labelAr", "labelEn"].forEach(function (id) { $(id).addEventListener("input", draw); });
     $("png").addEventListener("click", function () { if (current) pngBlob(current, function (b) { save(b, fileName("png")); }); });
-    $("svg").addEventListener("click", function () { if (current) save(new Blob([svgString(current)], { type: "image/svg+xml" }), fileName("svg")); });
+    $("svg").addEventListener("click", function () { if (current) save(new Blob([svgString(current, 4000)], { type: "image/svg+xml" }), fileName("svg")); });
 
-    var preset = new URLSearchParams(location.search).get("url");
-    if (preset) { state.target = "custom"; setTarget("custom"); $("url").value = preset; draw(); }
-    else setTarget("links");
+    // ?url=...&t=links|app|whatsapp opens the maker with that address and label.
+    var params = new URLSearchParams(location.search);
+    var preset = params.get("url"), presetT = params.get("t");
+    if (!LABELS[presetT]) presetT = preset ? "custom" : "links";
+    setTarget(presetT, preset || "");
+    fontsReady.then(draw); // redraw once the label font has loaded
   })();
   </script>
 </body>
