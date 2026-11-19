@@ -81,6 +81,38 @@ When the address is final, open `index.html` and `app/index.html` and replace `Y
 
 ---
 
+## For IT: hosting, limits and options
+
+**No expiry.** GitHub Pages is free for public repositories with no subscription, trial or renewal. `aljhospital.github.io` belongs to GitHub, so there is no domain to renew, and GitHub renews the HTTPS certificate automatically (also for a custom domain). The QR codes are static: they contain only the address, with no QR service in between.
+
+**Limits** ([GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)):
+
+| Limit | GitHub Pages | This site |
+|---|---|---|
+| Published site size | 1 GB | about 0.4 MB |
+| Bandwidth (soft limit) | 100 GB / month | about 0.25 MB per first visit, so roughly 400,000 first visits a month; repeat visits are cached |
+| Builds (soft limit) | 10 / hour | one per edit |
+| Use policy | informational sites allowed; not for e-commerce or SaaS | informational page, no transactions |
+
+**What could take it offline:** deleting or renaming the `aljhospital` organization or the repository, turning off Pages, or losing access to every owner account. Keep at least two owners with two-factor authentication.
+
+**Technical profile:** static HTML, CSS and JavaScript. No server code, database or build step. Fonts, icons and the QR generator are self-hosted, so the page makes no third-party requests, sets no cookies and collects no personal data (Cloudflare Web Analytics is off unless a token is added in `config.js`).
+
+### Hosting options
+
+1. **GitHub Pages + `links.aljhospital.com` (recommended).** One CNAME record (section 2). Editing in the browser stays the same.
+2. **Cloudflare Pages, connected to this repository.** Free, in the same Cloudflare account as aljhospital.com. It republishes automatically after every edit on GitHub, so the editing workflow stays the same.
+3. **The hospital's own web server (IIS, Apache or Nginx).** Copy the repository files into the web root of a site such as `links.aljhospital.com`, or into a folder such as `aljhospital.com/links/` (all paths are relative). Requirements:
+   - HTTPS certificate;
+   - `index.html` as the default document (needed for `/app/` and `/wa/`);
+   - MIME type `font/woff2` for `.woff2` files (IIS may need it added);
+   - `404.html` is only for GitHub; use the server's own error page instead.
+
+   Edits are then made to `config.js` on the server, or published automatically from GitHub with a deploy job (for example a GitHub Actions workflow using SFTP or rsync).
+4. **Any other static host**, such as Azure Static Web Apps or AWS S3 + CloudFront.
+
+**Moving later without breaking printed QR codes:** codes printed with `links.aljhospital.com` keep working wherever the site moves; IT just points the record at the new host. Codes printed with `aljhospital.github.io` need the GitHub site kept alive: either leave the custom domain set on it (GitHub then forwards the old address), or replace its contents with a single page that forwards to the new address.
+
 ## Status
 
 **Live at https://aljhospital.github.io**, owned by the `aljhospital` GitHub organization.
