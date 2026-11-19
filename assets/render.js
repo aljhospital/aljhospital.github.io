@@ -15,6 +15,7 @@
     smartphone: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
     link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
     chevron: '<path d="m9 18 6-6-6-6"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
   };
 
   var NAMES = {
@@ -334,8 +335,18 @@
       }
       var ac = appCard(cfg, lang);
       if (ac) main.appendChild(ac);
-      [listSection(UI.follow, cfg.social, lang), listSection(UI.contact, cfg.contact, lang)]
-        .forEach(function (s) { if (s) main.appendChild(s); });
+      var follow = listSection(UI.follow, cfg.social, lang);
+      if (follow) main.appendChild(follow);
+      var contact = listSection(UI.contact, cfg.contact, lang);
+      var hours = pick(cfg.hours, lang);
+      if (hours) {
+        if (!contact) { contact = el("section", "block"); }
+        var hrs = el("p", "hours");
+        hrs.appendChild(icon("clock", "hours-ico"));
+        hrs.appendChild(el("span", null, hours));
+        contact.appendChild(hrs);
+      }
+      if (contact) main.appendChild(contact);
       mount.appendChild(main);
 
       var f = el("footer", "foot", "© " + new Date().getFullYear() + " " + pick(cfg.name, lang));

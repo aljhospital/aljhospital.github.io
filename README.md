@@ -83,7 +83,7 @@ When the address is final, open `index.html` and `app/index.html` and replace `Y
 ## Still to fill in
 
 - [ ] Upload `logo.png`. A version with a transparent or white background works best. Optionally add a square emblem for the QR code (`qrLogo` in config.js).
-- [ ] Put the exact **hospital red** from the brand guidelines into `config.js` (`primary`). It is currently a close placeholder, `#C8102E`.
+- [ ] Put the exact **hospital red** from the brand guidelines into `config.js` (`primary`). It is set to `#E63038`, taken from the hospital website.
 - [ ] **Instagram, Snapchat, TikTok, Facebook, YouTube** links. They are hidden until filled in.
 - [ ] Optional: phone, WhatsApp, email, Google Maps link.
 - [ ] Optional: a **Book an appointment** button (an example is in config.js).

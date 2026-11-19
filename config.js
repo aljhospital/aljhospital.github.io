@@ -38,8 +38,8 @@ window.SITE = {
   // text    = main text colour (black).
   // The page background is white.
   colors: {
-    primary: "#C8102E",
-    text: "#111111",
+    primary: "#E63038",
+    text: "#000000",
   },
 
   // "auto" = Arabic for Arabic phones, English for everyone else.
@@ -84,7 +84,7 @@ window.SITE = {
     { type: "instagram", link: "" },   // e.g. "https://www.instagram.com/aljhospital"
     { type: "x",         link: "https://x.com/aljhospital" },
     { type: "snapchat",  link: "" },   // e.g. "https://www.snapchat.com/add/..."
-    { type: "tiktok",    link: "" },   // e.g. "https://www.tiktok.com/@..."
+    { type: "tiktok",    link: "https://www.tiktok.com/@alj.hospital" },
     { type: "linkedin",  link: "https://www.linkedin.com/company/aljhospital" },
     { type: "facebook",  link: "" },
     { type: "youtube",   link: "" },
@@ -98,8 +98,16 @@ window.SITE = {
      location: a Google Maps link                                   */
   contact: [
     { type: "phone",    link: "+966 12 677 0001" },
-    { type: "whatsapp", link: "" },
-    { type: "email",    link: "" },
-    { type: "location", link: "https://www.google.com/maps/search/?api=1&query=Abdul+Latif+Jameel+Hospital+Jeddah", note: { en: "Prince Moteb St, Al Safa, Jeddah", ar: "شارع الأمير متعب، حي الصفا، جدة" } },
+    { type: "whatsapp", link: "+966 54 631 2344", label: { en: "Book on WhatsApp", ar: "احجز عبر واتساب" } },
+    { type: "phone",    link: "+966 56 609 9540", label: { en: "Patient relations", ar: "علاقات المرضى" } },
+    { type: "email",    link: "info@aljhospital.com" },
+    { type: "location", link: "https://www.google.com/maps/search/?api=1&query=Abdul+Latif+Jameel+Hospital+Jeddah",
+      note: { en: "Prince Saud Ibn Abdullah Ibn Jalawi St, Jeddah", ar: "شارع الأمير سعود بن عبدالله بن جلوي، جدة" } },
   ],
+
+  // Opening hours, shown under the contact list. Leave "" to hide.
+  hours: {
+    en: "Saturday – Thursday · 9:00 AM – 10:00 PM",
+    ar: "السبت – الخميس · 9:00 ص – 10:00 م",
+  },
 };
