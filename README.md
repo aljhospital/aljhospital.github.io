@@ -89,7 +89,7 @@ When the address is final, open `index.html` and `app/index.html` and replace `Y
 
 | Limit | GitHub Pages | This site |
 |---|---|---|
-| Published site size | 1 GB | about 0.4 MB |
+| Published site size | 1 GB | about 0.5 MB |
 | Bandwidth (soft limit) | 100 GB / month | about 0.25 MB per first visit, so roughly 400,000 first visits a month; repeat visits are cached |
 | Builds (soft limit) | 10 / hour | one per edit |
 | Use policy | informational sites allowed; not for e-commerce or SaaS | informational page, no transactions |
