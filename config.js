@@ -49,7 +49,7 @@ window.SITE = {
 
   // The final public address of this page, once it is live,
   // e.g. "https://links.aljhospital.com". The QR code maker uses it.
-  siteUrl: "",
+  siteUrl: "https://aljhospital.github.io",
 
   // Optional, free visit statistics (how many people opened the page / scanned the QR).
   // Create a free "Web Analytics" site in Cloudflare and paste its token here.
