@@ -97,9 +97,9 @@ window.SITE = {
      email:    just the address
      location: a Google Maps link                                   */
   contact: [
-    { type: "phone",    link: "" },
+    { type: "phone",    link: "+966 12 677 0001" },
     { type: "whatsapp", link: "" },
     { type: "email",    link: "" },
-    { type: "location", link: "", note: { en: "Prince Moteb St, Al Safa, Jeddah", ar: "شارع الأمير متعب، حي الصفا، جدة" } },
+    { type: "location", link: "https://www.google.com/maps/search/?api=1&query=Abdul+Latif+Jameel+Hospital+Jeddah", note: { en: "Prince Moteb St, Al Safa, Jeddah", ar: "شارع الأمير متعب، حي الصفا، جدة" } },
   ],
 };
