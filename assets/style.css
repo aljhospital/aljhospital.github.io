@@ -157,15 +157,34 @@ a { color: inherit; text-decoration: none; }
 .row-chev { color: #B5B5B5; }
 [dir="rtl"] .row-chev svg, [dir="rtl"] .main-chev svg { transform: scaleX(-1); }
 
+/* Row with two buttons (call + WhatsApp) */
+.row-dual { align-items: flex-start; }
+.row-dual .row-ico { margin-top: 2px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 38px; padding: 7px 16px; border-radius: 999px;
+  font-size: 14.5px; font-weight: 600; color: var(--text);
+  background: var(--tint); transition: background .12s ease, transform .12s ease;
+}
+.pill-ico svg { width: 17px; height: 17px; display: block; color: var(--primary); }
+.pill-wa { background: #E6F9EE; }
+.pill-wa .pill-ico svg { color: #25D366; }
+.pill:active { transform: scale(.97); }
+
 /* Interaction */
 @media (hover: hover) {
   .main-btn:hover { transform: translateY(-1px); }
   .main-btn:not(:first-child):hover { border-color: var(--tint-strong); }
   .row:hover { background: var(--tint); }
+  .row-dual:hover { background: transparent; }
+  .pill:hover { background: var(--tint-strong); }
+  .pill-wa:hover { background: #D2F4E0; }
   .row:hover .row-chev { color: var(--primary); }
 }
 .main-btn:active, .store:active { transform: scale(.985); }
 .row:active { background: var(--tint-strong); }
+.row-dual:active { background: transparent; }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 12px; }
 
 .hours { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px 4px 0; font-size: 13.5px; color: var(--muted); }

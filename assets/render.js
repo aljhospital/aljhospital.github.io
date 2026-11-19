@@ -41,6 +41,8 @@
     iosTop:   { en: "Download on the", ar: "حمّله من" },
     andTop:   { en: "Get it on", ar: "احصل عليه من" },
     switchTo: { en: "عربي", ar: "English" },
+    call:     { en: "Call", ar: "اتصال" },
+    whatsapp: { en: "WhatsApp", ar: "واتساب" },
     switchLabel: { en: "التبديل إلى العربية", ar: "Switch to English" },
     broken:   { en: "This page's settings could not be loaded.", ar: "تعذّر تحميل إعدادات الصفحة." },
   };
@@ -184,7 +186,32 @@
     return buttons.length ? wrap : null;
   }
 
+  // A number reachable by both call and WhatsApp: one row, two buttons.
+  function dualRow(item, lang) {
+    var name = pick(item.label, lang) || pick(NAMES.phone, lang);
+    var r = el("div", "row row-dual");
+    r.appendChild(icon("phone", "row-ico"));
+    var txt = el("span", "row-txt");
+    txt.appendChild(el("strong", null, name));
+    var d = detail(item, lang);
+    if (d) txt.appendChild(el("small", null, d));
+    var acts = el("span", "row-actions");
+    [["phone", href(item), UI.call, "pill"],
+     ["whatsapp", href({ type: "whatsapp", link: item.link }), UI.whatsapp, "pill pill-wa"]].forEach(function (b) {
+      var a = el("a", b[3]);
+      a.href = b[1];
+      a.setAttribute("aria-label", name + " – " + pick(b[2], lang));
+      a.appendChild(icon(b[0], "pill-ico"));
+      a.appendChild(el("span", null, pick(b[2], lang)));
+      acts.appendChild(a);
+    });
+    txt.appendChild(acts);
+    r.appendChild(txt);
+    return r;
+  }
+
   function row(item, lang) {
+    if (item.type === "phone" && item.whatsapp) return dualRow(item, lang);
     var a = el("a", "row");
     a.href = href(item);
     a.appendChild(icon(item.type, "row-ico"));

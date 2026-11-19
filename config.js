@@ -89,20 +89,21 @@ window.SITE = {
       note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
     { type: "facebook",  link: "https://www.facebook.com/profile.php?id=61554454365157",
       note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
-    { type: "linkedin",  link: "https://www.linkedin.com/company/aljhospital",
+    { type: "linkedin",  link: "https://www.linkedin.com/company/aljhospital/posts/",
       note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
   ],
 
 
   /* ---------- Contact ----------
      phone:    just the number, e.g. "+966126770001"
+               add  whatsapp: true  to show both "Call" and "WhatsApp" buttons
      whatsapp: just the number, e.g. "+9665XXXXXXXX"
      email:    just the address
      location: a Google Maps link                                   */
   contact: [
     { type: "phone",    link: "+966 12 677 0001" },
     { type: "whatsapp", link: "+966 54 631 2344", label: { en: "Book on WhatsApp", ar: "احجز عبر واتساب" } },
-    { type: "phone",    link: "+966 56 609 9540", label: { en: "Patient relations", ar: "علاقات المرضى" } },
+    { type: "phone",    link: "+966 56 609 9540", label: { en: "Patient relations", ar: "علاقات المرضى" }, whatsapp: true },
     { type: "email",    link: "info@aljhospital.com" },
     { type: "location", link: "https://maps.app.goo.gl/a2DJxtPF9EqhjwLJA",
       note: { en: "Prince Saud Ibn Abdullah Ibn Jalawi St, Jeddah", ar: "شارع الأمير سعود بن عبدالله بن جلوي، جدة" } },
