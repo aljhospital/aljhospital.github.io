@@ -83,11 +83,17 @@ When the address is final, open `index.html` and `app/index.html` and replace `Y
 
 ## Status
 
-Done: logo, brand colours (from the hospital website), website, app links, Instagram, X, TikTok, YouTube, Facebook, LinkedIn, phone numbers, WhatsApp booking, email, map pin and opening hours.
+**Live at https://aljhospital.github.io**, owned by the `aljhospital` GitHub organization.
+
+| Link | Opens |
+|---|---|
+| https://aljhospital.github.io | The links page |
+| https://aljhospital.github.io/wa | WhatsApp booking chat |
+| https://aljhospital.github.io/app | App Store or Google Play, depending on the phone |
+| https://aljhospital.github.io/qr.html | The QR code maker |
 
 Still to do:
 
-- [ ] Optional: a higher-resolution or SVG logo for extra-sharp phone screens (replace `logo.png`).
-- [ ] Snapchat link, when ready.
-- [ ] Move to a hospital-owned address (GitHub organization and/or `links.aljhospital.com`).
-- [ ] Then set `siteUrl` and replace `YOUR-ADDRESS`, make the final QR codes and test them before printing.
+- [ ] Invite a second owner to the organization (e.g. the marketing manager), and turn on two-factor authentication for every owner.
+- [ ] Optional: `links.aljhospital.com` through IT (section 2). If it is added later, set `siteUrl` in `config.js` and `og:image` in the three `index.html` files to the new address; printed `aljhospital.github.io` codes keep working through GitHub's automatic redirect.
+- [ ] Optional: a higher-resolution or SVG logo, and a Snapchat link.
