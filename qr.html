@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>QR Code Maker</title>
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .qr-page { max-width: 560px; margin: 0 auto; padding: 28px 16px 40px; }
+    .qr-page h1 { font-size: 24px; margin: 0 0 4px; }
+    .qr-page > p { margin: 0 0 20px; color: var(--muted); }
+    .panel { padding: 20px; margin-bottom: 16px; }
+    label.f { display: block; font-weight: 600; font-size: 14px; margin: 0 0 6px; }
+    .seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .seg button {
+      font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line);
+      background: #fff; color: var(--text);
+    }
+    .seg button[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+    input[type=url] {
+      width: 100%; font: inherit; font-size: 15px; padding: 11px 13px;
+      border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 16px; direction: ltr;
+    }
+    input[type=url]:focus { outline: none; border-color: var(--primary); }
+    .check { display: flex; align-items: center; gap: 8px; font-size: 14.5px; margin-bottom: 4px; }
+    .check input { width: 18px; height: 18px; accent-color: var(--primary); }
+    .preview { display: grid; place-items: center; padding: 24px; }
+    .preview svg { width: 100%; max-width: 300px; height: auto; display: block; }
+    .empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+    .actions button {
+      font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+      padding: 13px; border-radius: 14px; border: 0; background: var(--primary); color: #fff;
+    }
+    .actions button.alt { background: var(--tint-strong); color: var(--primary); }
+    .actions button:disabled { opacity: .4; cursor: not-allowed; }
+    .encoded { font-size: 13px; color: var(--muted); text-align: center; margin-top: 12px; word-break: break-all; direction: ltr; }
+    ul.tips { margin: 0; padding-inline-start: 20px; color: var(--muted); font-size: 14px; }
+    ul.tips li { margin: 4px 0; }
+    .warn { background: #FFF6E0; color: #6B4A00; border-radius: 12px; padding: 10px 12px; font-size: 14px; margin: -4px 0 16px; }
+  </style>
+</head>
+<body>
+  <div class="qr-page">
+    <h1>QR Code Maker</h1>
+    <p>Make the QR code for the links page or the app link. You can edit the links at any time without reprinting the QR code.</p>
+
+    <div class="card panel">
+      <label class="f">Where should the QR code go?</label>
+      <div class="seg" id="target">
+        <button type="button" data-t="links" aria-pressed="true">Links page</button>
+        <button type="button" data-t="app" aria-pressed="false">App download</button>
+        <button type="button" data-t="custom" aria-pressed="false">Other address</button>
+      </div>
+      <input type="url" id="url" placeholder="https://links.aljhospital.com" autocomplete="off" spellcheck="false">
+      <div class="warn" id="warn" hidden></div>
+
+      <label class="f">Colour</label>
+      <div class="seg" id="colour">
+        <button type="button" data-c="black" aria-pressed="true">Black (safest)</button>
+        <button type="button" data-c="brand" aria-pressed="false">Hospital red</button>
+      </div>
+      <label class="check" id="logoRow"><input type="checkbox" id="withLogo" checked> Hospital logo in the middle</label>
+    </div>
+
+    <div class="card panel">
+      <div class="preview" id="preview"></div>
+      <div class="actions">
+        <button type="button" id="png">Download PNG</button>
+        <button type="button" id="svg" class="alt">Download SVG (print)</button>
+      </div>
+      <div class="encoded" id="encoded"></div>
+    </div>
+
+    <div class="card panel">
+      <label class="f">Before printing</label>
+      <ul class="tips">
+        <li>Scan the code with an iPhone <b>and</b> an Android phone first.</li>
+        <li>Give the printer the <b>SVG</b>. It stays sharp at any size. Use the PNG for social posts and screens.</li>
+        <li>Print it at least <b>2.5 cm</b> wide (5 cm or more on posters and roll-ups), with a white margin around it.</li>
+        <li>The QR code holds the page <i>address</i>, not the links. Changing links in <code>config.js</code> never needs a reprint. Only changing the address does.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="assets/qrcode.js"></script>
+  <script>
+  (function () {
+    var cfg = window.SITE || {};
+    var colours = cfg.colors || {};
+    if (colours.primary) document.documentElement.style.setProperty("--primary", colours.primary);
+    if (colours.text) document.documentElement.style.setProperty("--text", colours.text);
+
+    var $ = function (id) { return document.getElementById(id); };
+    var state = { target: "links", colour: "black", logo: null };
+
+    // Base address of the links page.
+    function baseUrl() {
+      var s = String(cfg.siteUrl || "").trim();
+      if (s) return s.replace(/\/+$/, "") + "/";
+      if (/^https?:$/.test(location.protocol) && !/^(localhost|127\.)/.test(location.hostname)) {
+        return location.origin + location.pathname.replace(/[^/]*$/, "");
+      }
+      return "";
+    }
+    function suggested(t) {
+      var b = baseUrl();
+      if (!b) return "";
+      return t === "app" ? b + "app/" : b;
+    }
+
+    // Load the logo once (for the middle of the code).
+    var logoSrc = cfg.qrLogo || cfg.logo;
+    if (logoSrc) {
+      var img = new Image();
+      img.onload = function () { state.logo = img; draw(); };
+      img.onerror = function () { $("logoRow").hidden = true; };
+      img.src = logoSrc;
+    } else {
+      $("logoRow").hidden = true;
+    }
+
+    function fg() { return state.colour === "black" ? "#000000" : (colours.primary || "#C8102E"); }
+    function useLogo() { return !!state.logo && $("withLogo").checked; }
+
+    function build(text) {
+      var qr = qrcode(0, useLogo() ? "H" : "M");
+      qr.addData(text);
+      qr.make();
+      return qr;
+    }
+
+    // Logo box in module units, centred, kept small enough that the code still scans.
+    function logoBox(n) {
+      var a = state.logo.naturalWidth / state.logo.naturalHeight || 1;
+      var maxW = n * 0.38, maxH = n * 0.24, pad = 1;
+      var w = maxW - 2 * pad, h = w / a;
+      if (h > maxH - 2 * pad) { h = maxH - 2 * pad; w = h * a; }
+      var cap = n * n * 0.07; // never cover more than ~7% of the code
+      if ((w + 2 * pad) * (h + 2 * pad) > cap) { var k = Math.sqrt(cap / ((w + 2 * pad) * (h + 2 * pad))); w *= k; h *= k; }
+      var bw = Math.ceil(w + 2 * pad), bh = Math.ceil(h + 2 * pad);
+      if ((n - bw) % 2) bw++;
+      if ((n - bh) % 2) bh++;
+      return { bx: (n - bw) / 2, by: (n - bh) / 2, bw: bw, bh: bh, lw: w, lh: h, lx: (n - w) / 2, ly: (n - h) / 2 };
+    }
+
+    function logoDataUrl() {
+      try {
+        var c = document.createElement("canvas");
+        c.width = state.logo.naturalWidth; c.height = state.logo.naturalHeight;
+        c.getContext("2d").drawImage(state.logo, 0, 0);
+        return c.toDataURL("image/png");
+      } catch (e) { return null; } // opened from disk: browser blocks reading the image
+    }
+
+    function svgString(qr) {
+      var n = qr.getModuleCount(), q = 4, size = n + 2 * q, box = useLogo() ? logoBox(n) : null;
+      var d = "";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+        if (!qr.isDark(r, c)) continue;
+        if (box && c >= box.bx && c < box.bx + box.bw && r >= box.by && r < box.by + box.bh) continue;
+        d += "M" + (c + q) + " " + (r + q) + "h1v1h-1z";
+      }
+      var out = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + " " + size + '" shape-rendering="crispEdges">' +
+        '<rect width="' + size + '" height="' + size + '" fill="#fff"/>' +
+        '<path fill="' + fg() + '" d="' + d + '"/>';
+      if (box) {
+        var data = logoDataUrl();
+        if (data) {
+          out += '<rect x="' + (box.bx + q) + '" y="' + (box.by + q) + '" width="' + box.bw + '" height="' + box.bh + '" rx="1" fill="#fff"/>' +
+            '<image href="' + data + '" x="' + (box.lx + q) + '" y="' + (box.ly + q) + '" width="' + box.lw + '" height="' + box.lh + '" preserveAspectRatio="xMidYMid meet"/>';
+        }
+      }
+      return out + "</svg>";
+    }
+
+    function pngBlob(qr, cb) {
+      var n = qr.getModuleCount(), q = 4, size = n + 2 * q;
+      var scale = Math.max(8, Math.floor(2048 / size));
+      var cv = document.createElement("canvas");
+      cv.width = cv.height = size * scale;
+      var g = cv.getContext("2d");
+      g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+      g.fillStyle = fg();
+      var box = useLogo() ? logoBox(n) : null;
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+        if (!qr.isDark(r, c)) continue;
+        if (box && c >= box.bx && c < box.bx + box.bw && r >= box.by && r < box.by + box.bh) continue;
+        g.fillRect((c + q) * scale, (r + q) * scale, scale, scale);
+      }
+      if (box) {
+        g.drawImage(state.logo, (box.lx + q) * scale, (box.ly + q) * scale, box.lw * scale, box.lh * scale);
+      }
+      try { cv.toBlob(cb, "image/png"); }
+      catch (e) { alert("The browser blocked the logo when this page was opened from a file. Open it from the live website, or untick the logo."); }
+    }
+
+    function save(blob, name) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    }
+
+    function fileName(ext) {
+      return "aljh-qr-" + (state.target === "app" ? "app" : state.target === "custom" ? "custom" : "links") + "-" + state.colour + "." + ext;
+    }
+
+    var current = null;
+    function draw() {
+      var text = $("url").value.trim();
+      var warn = $("warn");
+      warn.hidden = true;
+      if (!text) {
+        current = null;
+        $("preview").innerHTML = '<div class="empty">Type the page address above, or set <code>siteUrl</code> in config.js.</div>';
+        $("encoded").textContent = "";
+        $("png").disabled = $("svg").disabled = true;
+        return;
+      }
+      if (!/^https:\/\//i.test(text)) { warn.textContent = "Tip: the address should start with https://"; warn.hidden = false; }
+      if (/YOUR-ADDRESS|localhost|127\.0\.0\.1|^file:/i.test(text)) { warn.textContent = "This is not a public address. Use the live page address before printing."; warn.hidden = false; }
+      try { current = build(text); } catch (e) { current = null; }
+      if (!current) { $("preview").innerHTML = '<div class="empty">That address is too long for a QR code.</div>'; return; }
+      $("preview").innerHTML = svgString(current);
+      $("encoded").textContent = text;
+      $("png").disabled = $("svg").disabled = false;
+    }
+
+    function setTarget(t) {
+      state.target = t;
+      [].forEach.call($("target").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.t === t)); });
+      if (t !== "custom") $("url").value = suggested(t);
+      else { $("url").value = ""; $("url").focus(); }
+      draw();
+    }
+
+    $("target").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) setTarget(b.dataset.t); });
+    $("colour").addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      state.colour = b.dataset.c;
+      [].forEach.call($("colour").children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      draw();
+    });
+    $("withLogo").addEventListener("change", draw);
+    $("url").addEventListener("input", draw);
+    $("png").addEventListener("click", function () { if (current) pngBlob(current, function (b) { save(b, fileName("png")); }); });
+    $("svg").addEventListener("click", function () { if (current) save(new Blob([svgString(current)], { type: "image/svg+xml" }), fileName("svg")); });
+
+    var preset = new URLSearchParams(location.search).get("url");
+    if (preset) { state.target = "custom"; setTarget("custom"); $("url").value = preset; draw(); }
+    else setTarget("links");
+  })();
+  </script>
+</body>
+</html>
