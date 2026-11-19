@@ -24,14 +24,14 @@ window.SITE = {
     ar: "التأهيل الطبي والرعاية التخصصية · جدة",
   },
 
-  // Upload the hospital logo next to this file, named exactly logo.png.
-  // A logo with a transparent or white background works best.
-  // If the file is missing, the page shows the name only.
+  // The hospital logo, next to this file. A transparent or white background works best.
+  // While the logo shows, the typed name above is hidden (the logo already contains it).
+  // If the file is missing, the page shows the typed name instead.
   logo: "logo.png",
 
-  // Optional: a square version of the logo (just the emblem) for the middle
-  // of the QR code, e.g. "logo-square.png". Leave "" to use logo.png.
-  qrLogo: "",
+  // The square emblem, used in the middle of the QR code.
+  // (icon.png / favicon.png are the browser-tab and home-screen icons.)
+  qrLogo: "logo-mark.png",
 
   // Brand colours (hex codes from the brand guidelines).
   // primary = the hospital red (buttons, icons, accents). Keep it dark enough for white text on it.
@@ -81,13 +81,16 @@ window.SITE = {
      Supported types: instagram, x, linkedin, facebook, youtube,
                       tiktok, snapchat, threads, whatsapp            */
   social: [
-    { type: "instagram", link: "" },   // e.g. "https://www.instagram.com/aljhospital"
+    { type: "instagram", link: "https://www.instagram.com/alj_hospital" },
     { type: "x",         link: "https://x.com/aljhospital" },
-    { type: "snapchat",  link: "" },   // e.g. "https://www.snapchat.com/add/..."
     { type: "tiktok",    link: "https://www.tiktok.com/@alj.hospital" },
-    { type: "linkedin",  link: "https://www.linkedin.com/company/aljhospital" },
-    { type: "facebook",  link: "" },
-    { type: "youtube",   link: "" },
+    { type: "snapchat",  link: "" },   // e.g. "https://www.snapchat.com/add/..."
+    { type: "youtube",   link: "https://www.youtube.com/@abdullatifjameelhospital7396",
+      note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
+    { type: "facebook",  link: "https://www.facebook.com/profile.php?id=61554454365157",
+      note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
+    { type: "linkedin",  link: "https://www.linkedin.com/company/aljhospital",
+      note: { en: "Abdul Latif Jameel Hospital", ar: "مستشفى عبداللطيف جميل" } },
   ],
 
 
@@ -101,7 +104,7 @@ window.SITE = {
     { type: "whatsapp", link: "+966 54 631 2344", label: { en: "Book on WhatsApp", ar: "احجز عبر واتساب" } },
     { type: "phone",    link: "+966 56 609 9540", label: { en: "Patient relations", ar: "علاقات المرضى" } },
     { type: "email",    link: "info@aljhospital.com" },
-    { type: "location", link: "https://www.google.com/maps/search/?api=1&query=Abdul+Latif+Jameel+Hospital+Jeddah",
+    { type: "location", link: "https://maps.app.goo.gl/a2DJxtPF9EqhjwLJA",
       note: { en: "Prince Saud Ibn Abdullah Ibn Jalawi St, Jeddah", ar: "شارع الأمير سعود بن عبدالله بن جلوي، جدة" } },
   ],
 

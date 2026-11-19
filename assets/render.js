@@ -250,10 +250,6 @@
     var st = document.documentElement.style;
     if (c.primary) st.setProperty("--primary", c.primary);
     if (c.text) st.setProperty("--text", c.text);
-    if (cfg.logo) {
-      var fav = document.querySelector('link[rel="icon"]');
-      if (fav) fav.href = root + cfg.logo;
-    }
   }
 
   function header(cfg, lang, root, onToggle) {
@@ -268,9 +264,10 @@
     if (cfg.logo) {
       var lw = el("div", "logo");
       var img = new Image();
-      img.alt = pick(cfg.name, lang);
+      img.alt = ""; // the name is in the heading below (visually hidden while the logo shows)
       img.decoding = "async";
-      img.onerror = function () { lw.remove(); h.classList.add("no-logo"); };
+      h.classList.add("has-logo");
+      img.onerror = function () { lw.remove(); h.classList.remove("has-logo"); h.classList.add("no-logo"); };
       img.src = root + cfg.logo;
       lw.appendChild(img);
       h.appendChild(lw);

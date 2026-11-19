@@ -80,13 +80,13 @@ When the address is final, open `index.html` and `app/index.html` and replace `Y
 
 ---
 
-## Still to fill in
+## Status
 
-- [ ] Upload `logo.png`. A version with a transparent or white background works best. Optionally add a square emblem for the QR code (`qrLogo` in config.js).
-- [ ] Put the exact **hospital red** from the brand guidelines into `config.js` (`primary`). It is set to `#E63038`, taken from the hospital website.
-- [ ] **Instagram, Snapchat, TikTok, Facebook, YouTube** links. They are hidden until filled in.
-- [ ] Optional: phone, WhatsApp, email, Google Maps link.
-- [ ] Optional: a **Book an appointment** button (an example is in config.js).
-- [ ] `siteUrl` and `YOUR-ADDRESS` once the page is live.
+Done: logo, brand colours (from the hospital website), website, app links, Instagram, X, TikTok, YouTube, Facebook, LinkedIn, phone numbers, WhatsApp booking, email, map pin and opening hours.
 
-Pre-filled and checked: website (aljhospital.com), X (@aljhospital), LinkedIn, App Store and Google Play app links.
+Still to do:
+
+- [ ] Optional: a higher-resolution or SVG logo for extra-sharp phone screens (replace `logo.png`).
+- [ ] Snapchat link, when ready.
+- [ ] Move to a hospital-owned address (GitHub organization and/or `links.aljhospital.com`).
+- [ ] Then set `siteUrl` and replace `YOUR-ADDRESS`, make the final QR codes and test them before printing.
