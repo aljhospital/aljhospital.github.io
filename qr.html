@@ -47,13 +47,14 @@
 <body>
   <div class="qr-page">
     <h1>QR Code Maker</h1>
-    <p>Make the QR code for the links page or the app link. You can edit the links at any time without reprinting the QR code.</p>
+    <p>Make the QR code for the links page, the app link or WhatsApp booking. You can edit the links at any time without reprinting the QR code.</p>
 
     <div class="card panel">
       <label class="f">Where should the QR code go?</label>
       <div class="seg" id="target">
         <button type="button" data-t="links" aria-pressed="true">Links page</button>
         <button type="button" data-t="app" aria-pressed="false">App download</button>
+        <button type="button" data-t="whatsapp" aria-pressed="false">WhatsApp booking</button>
         <button type="button" data-t="custom" aria-pressed="false">Other address</button>
       </div>
       <input type="url" id="url" placeholder="https://links.aljhospital.com" autocomplete="off" spellcheck="false">
@@ -112,7 +113,7 @@
     function suggested(t) {
       var b = baseUrl();
       if (!b) return "";
-      return t === "app" ? b + "app/" : b;
+      return t === "app" ? b + "app/" : t === "whatsapp" ? b + "wa/" : b;
     }
 
     // Load the logo once (for the middle of the code).
@@ -214,7 +215,7 @@
     }
 
     function fileName(ext) {
-      return "aljh-qr-" + (state.target === "app" ? "app" : state.target === "custom" ? "custom" : "links") + "-" + state.colour + "." + ext;
+      return "aljh-qr-" + state.target + "-" + state.colour + "." + ext;
     }
 
     var current = null;

@@ -99,6 +99,7 @@ window.SITE = {
      phone:    just the number, e.g. "+966126770001"
                add  whatsapp: true  to show both "Call" and "WhatsApp" buttons
      whatsapp: just the number, e.g. "+9665XXXXXXXX"
+               (the first WhatsApp number is also what the /wa/ link and its QR code open)
      email:    just the address
      location: a Google Maps link                                   */
   contact: [

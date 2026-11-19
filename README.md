@@ -8,6 +8,7 @@ One link and one QR code that open a branded page with the hospital's website, a
 | `logo.png` | ★ **You add this.** The hospital logo |
 | `index.html` | The links page |
 | `app/` | Smart app link: iPhones go to the App Store, Android phones go to Google Play |
+| `wa/` | WhatsApp booking link: opens a chat with the booking number |
 | `qr.html` | QR code maker (for the marketing team) |
 | `assets/` | Design, icons, font. No need to touch |
 

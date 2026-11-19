@@ -411,6 +411,38 @@
     draw();
   }
 
+  // /wa/ : opens the booking chat (the first WhatsApp number in the contact list).
+  function renderWhatsApp(mount, root) {
+    var cfg = window.SITE;
+    if (!cfg) return broken(mount);
+    var item = (cfg.contact || []).filter(function (c) {
+      return c && c.type === "whatsapp" && String(c.link || "").trim();
+    })[0];
+    if (!item) return location.replace(root || "./");
+    if (!new URLSearchParams(location.search).has("stay")) location.replace(href(item));
+    // Shown only if the browser does not jump straight to WhatsApp.
+    applyBrand(cfg, root);
+    var lang = chooseLang(cfg);
+    function draw() {
+      setLang(lang, cfg);
+      mount.innerHTML = "";
+      mount.appendChild(header(cfg, lang, root, function () {
+        lang = lang === "ar" ? "en" : "ar";
+        try { localStorage.setItem("aljh-lang", lang); } catch (e) {}
+        draw();
+      }));
+      var main = el("main", "content");
+      var m = el("section", "block mains");
+      m.appendChild(mainButton(item, lang));
+      main.appendChild(m);
+      var back = el("a", "back", lang === "ar" ? "كل روابطنا ←" : "All our links →");
+      back.href = root || "./";
+      main.appendChild(back);
+      mount.appendChild(main);
+    }
+    draw();
+  }
+
   function broken(mount) {
     var lang = /^ar\b/i.test(navigator.language || "") ? "ar" : "en";
     mount.innerHTML = "";
@@ -419,5 +451,5 @@
     console.error("config.js failed to load or has a typo. Check the browser console for the line number.");
   }
 
-  window.ALJH = { renderHome: renderHome, renderApp: renderApp };
+  window.ALJH = { renderHome: renderHome, renderApp: renderApp, renderWhatsApp: renderWhatsApp };
 })();
